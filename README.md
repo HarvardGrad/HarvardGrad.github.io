@@ -1,1 +1,1639 @@
-# HarvardGrad.github.io
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programme Name Preview</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide icons as SVG -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 8px;
+        }
+        
+        .progress-fill {
+            height: 8px;
+            border-radius: 9999px;
+            transition: all 0.5s;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            padding: 2rem;
+        }
+        
+        /* Card flip animation styles */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            border: 2px solid #e5e7eb;
+            background-color: white;
+        }
+        
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 56rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .btn-primary {
+            background-color: #ff7c22;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+            border-color: #9ca3af;
+        }
+        
+        .btn-secondary.active {
+            background-color: #ff7c22;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stage-reach { background-color: #fff7ed; }
+        .stage-awareness { background-color: #ffedd5; }
+        .stage-credibility { background-color: #fed7aa; }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen bg-gradient-to-br from-gray-50 to-white p-8">
+        <!-- Main Dashboard View -->
+        <div id="dashboard-view" class="max-w-7xl mx-auto">
+            <div class="mb-10">
+                <h1 class="text-5xl font-bold text-gray-900 mb-3">Programme Name</h1>
+                <p class="text-xl text-gray-600 mb-8">Monitor target companies across the engagement funnel</p>
+                
+                <!-- Programme Summary -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Programme Summary</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                        <!-- Always On Targets -->
+                        <div class="bg-white rounded-lg border-2 border-gray-200 p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="targets-count">6</div>
+                            <div class="text-sm text-gray-600 mt-1">Always On Targets</div>
+                            <div class="text-xs text-gray-500">out of 25 scope</div>
+                        </div>
+                        
+                        <!-- Total Active Tacticals -->
+                        <div class="bg-white rounded-lg border-2 border-gray-200 p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="tacticals-count">12</div>
+                            <div class="text-sm text-gray-600 mt-1">Active Tacticals</div>
+                        </div>
+                        
+                        <!-- Total Impressions -->
+                        <div class="bg-white rounded-lg border-2 border-gray-200 p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="total-impressions">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Total Impressions</div>
+                        </div>
+                        
+                        <!-- Total Complete Views -->
+                        <div class="bg-white rounded-lg border-2 border-gray-200 p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="total-complete-views">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Complete Views</div>
+                        </div>
+                        
+                        <!-- Total Watch Time -->
+                        <div class="bg-white rounded-lg border-2 border-gray-200 p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-500" id="total-watch-time">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Watch Time (hrs)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <div class="relative max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="company-search" 
+                            placeholder="Search companies..." 
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                        />
+                    </div>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="flex gap-3">
+                    <button class="filter-btn btn-secondary active" data-filter="All">All</button>
+                    <button class="filter-btn btn-secondary" data-filter="Reach">Reach</button>
+                    <button class="filter-btn btn-secondary" data-filter="Awareness">Awareness</button>
+                    <button class="filter-btn btn-secondary" data-filter="Credibility">Credibility</button>
+                </div>
+            </div>
+
+            <!-- Stage-Organized Companies View -->
+            <div id="companies-organized" class="space-y-12">
+                <!-- Reach Stage Section -->
+                <div class="stage-section">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: #f97316;">
+                            <i data-lucide="target" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Reach Stage</h2>
+                            <p class="text-gray-600">Building initial awareness and impressions</p>
+                        </div>
+                        <div class="ml-auto">
+                            <span id="reach-count" class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">0 companies</span>
+                        </div>
+                    </div>
+                    <div id="reach-companies" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Reach companies will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Awareness Stage Section -->
+                <div class="stage-section">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: #ea580c;">
+                            <i data-lucide="eye" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Awareness Stage</h2>
+                            <p class="text-gray-600">Generating views and engagement</p>
+                        </div>
+                        <div class="ml-auto">
+                            <span id="awareness-count" class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">0 companies</span>
+                        </div>
+                    </div>
+                    <div id="awareness-companies" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Awareness companies will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Credibility Stage Section -->
+                <div class="stage-section">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: #dc2626;">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Credibility Stage</h2>
+                            <p class="text-gray-600">Achieving sales-ready engagement</p>
+                        </div>
+                        <div class="ml-auto">
+                            <span id="credibility-count" class="bg-red-100 text-red-800 px-3 py-1 rounded-full font-semibold">0 companies</span>
+                        </div>
+                    </div>
+                    <div id="credibility-companies" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Credibility companies will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Modal -->
+    <div id="content-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 id="modal-title" class="text-3xl font-bold text-gray-900 mb-2"></h3>
+                        <p id="modal-date" class="text-gray-500"></p>
+                    </div>
+                    <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+                </div>
+                <div class="mb-6">
+                    <img id="modal-thumbnail" class="w-full rounded-lg shadow-md" />
+                </div>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">Impressions</div>
+                        <div id="modal-impressions" class="text-2xl font-bold text-gray-900"></div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-sm text-gray-600 mb-1">Complete Views</div>
+                        <div id="modal-views" class="text-2xl font-bold text-gray-900"></div>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background-color: #fff5f0;">
+                        <div class="text-sm text-gray-600 mb-1">Complete View Rate</div>
+                        <div id="modal-rate" class="text-2xl font-bold" style="color: #ff7c22;"></div>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold text-gray-900 mb-3">Content Copy</h4>
+                    <p id="modal-copy" class="text-gray-700 leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const companies = [
+            {
+                id: 1,
+                name: "TechCorp Solutions",
+                logo: "TC",
+                stage: "Reach",
+                metrics: { impressions: 35000, views: 0, completeViews: 0, watchTime: 0 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 2,
+                name: "Global Innovations Inc",
+                logo: "GI",
+                stage: "Awareness",
+                metrics: { impressions: 78000, views: 8500, completeViews: 3200, watchTime: 180 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 3,
+                name: "Enterprise Dynamics",
+                logo: "ED",
+                stage: "Credibility",
+                metrics: { impressions: 125000, views: 28000, completeViews: 18000, watchTime: 650 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 4,
+                name: "Digital Ventures Ltd",
+                logo: "DV",
+                stage: "Reach",
+                metrics: { impressions: 28000, views: 0, completeViews: 0, watchTime: 0 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 5,
+                name: "Cloud Systems Pro",
+                logo: "CS",
+                stage: "Awareness",
+                metrics: { impressions: 65000, views: 12000, completeViews: 6800, watchTime: 320 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 6,
+                name: "Future Tech Partners",
+                logo: "FT",
+                stage: "Reach",
+                metrics: { impressions: 42000, views: 0, completeViews: 0, watchTime: 0 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            },
+            {
+                id: 7,
+                name: "Strategic Solutions Group",
+                logo: "SS",
+                stage: "Credibility",
+                metrics: { impressions: 95000, views: 26000, completeViews: 16500, watchTime: 380 },
+                thresholds: {
+                    awareness: { views: 10000, completeViews: 5000 },
+                    credibility: { views: 25000, completeViews: 15000, watchTime: 500 }
+                }
+            }
+        ];
+
+        const performanceData = [
+            // August data - Daily performance metrics with realistic engagement rate fluctuations
+            { date: 'Aug 1', impressions: 2400, completeViews: 180, completeViewRate: 7.5 },
+            { date: 'Aug 3', impressions: 1800, completeViews: 144, completeViewRate: 8.0 },
+            { date: 'Aug 5', impressions: 3200, completeViews: 224, completeViewRate: 7.0 }, // Content didn't resonate
+            { date: 'Aug 7', impressions: 2100, completeViews: 189, completeViewRate: 9.0 }, // Better targeting
+            { date: 'Aug 9', impressions: 2900, completeViews: 203, completeViewRate: 7.0 }, // Audience fatigue
+            { date: 'Aug 11', impressions: 1600, completeViews: 144, completeViewRate: 9.0 }, // Weekend quality traffic
+            { date: 'Aug 13', impressions: 3500, completeViews: 280, completeViewRate: 8.0 }, // Monday volume dilution
+            { date: 'Aug 15', impressions: 2800, completeViews: 252, completeViewRate: 9.0 },
+            { date: 'Aug 17', impressions: 1400, completeViews: 154, completeViewRate: 11.0 }, // Weekend engaged audience
+            { date: 'Aug 19', impressions: 3100, completeViews: 248, completeViewRate: 8.0 }, // Back to work distraction
+            { date: 'Aug 21', impressions: 2600, completeViews: 234, completeViewRate: 9.0 },
+            { date: 'Aug 23', impressions: 3800, completeViews: 342, completeViewRate: 9.0 }, // Consistent performance
+            { date: 'Aug 25', impressions: 1900, completeViews: 209, completeViewRate: 11.0 }, // Weekend quality
+            { date: 'Aug 27', impressions: 3300, completeViews: 297, completeViewRate: 9.0 },
+            { date: 'Aug 29', impressions: 2700, completeViews: 270, completeViewRate: 10.0 }, // Slight improvement
+            { date: 'Aug 31', impressions: 1800, completeViews: 180, completeViewRate: 10.0 },
+            
+            // September data - Some optimization but still with natural fluctuations
+            { date: 'Sep 2', impressions: 2200, completeViews: 198, completeViewRate: 9.0 }, // Holiday impact
+            { date: 'Sep 4', impressions: 4200, completeViews: 462, completeViewRate: 11.0 }, // Strong content launch
+            { date: 'Sep 6', impressions: 3600, completeViews: 324, completeViewRate: 9.0 }, // Content fatigue sets in
+            { date: 'Sep 8', impressions: 2100, completeViews: 231, completeViewRate: 11.0 }, // Friday engaged audience
+            { date: 'Sep 10', impressions: 1500, completeViews: 180, completeViewRate: 12.0 }, // Weekend quality traffic
+            { date: 'Sep 12', impressions: 4800, completeViews: 432, completeViewRate: 9.0 }, // High volume dilutes rate
+            { date: 'Sep 14', impressions: 3900, completeViews: 429, completeViewRate: 11.0 }, // Campaign optimization
+            { date: 'Sep 16', impressions: 2800, completeViews: 280, completeViewRate: 10.0 },
+            { date: 'Sep 18', impressions: 5200, completeViews: 468, completeViewRate: 9.0 }, // Volume spike hurts rate
+            { date: 'Sep 20', impressions: 2600, completeViews: 312, completeViewRate: 12.0 }, // Better targeting kicks in
+            { date: 'Sep 22', impressions: 1700, completeViews: 187, completeViewRate: 11.0 }, // Weekend consistency
+            { date: 'Sep 24', impressions: 4100, completeViews: 451, completeViewRate: 11.0 }, // Sustained improvement
+            { date: 'Sep 26', impressions: 3500, completeViews: 350, completeViewRate: 10.0 }, // Slight dip
+            { date: 'Sep 28', impressions: 2900, completeViews: 348, completeViewRate: 12.0 }, // Strong finish trend
+            { date: 'Sep 30', impressions: 3800, completeViews: 418, completeViewRate: 11.0 }  // Good month end
+        ];
+
+        const contentHistory = [
+            { 
+                id: 1, 
+                title: "Product Innovation Webinar", 
+                date: "2025-09-15", 
+                startDate: "2025-09-10",
+                endDate: "2025-09-30",
+                isActive: false,
+                impressions: 15000, 
+                completeViews: 3200, 
+                thumbnail: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=225&fit=crop", 
+                copy: "Join our experts as they unveil the latest innovations in product development and discuss how emerging technologies are reshaping the industry landscape." 
+            },
+            { 
+                id: 2, 
+                title: "Industry Trends Report", 
+                date: "2025-09-22", 
+                startDate: "2025-09-18",
+                endDate: "2025-10-15",
+                isActive: true,
+                impressions: 12000, 
+                completeViews: 2800, 
+                thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=225&fit=crop", 
+                copy: "Discover the key trends driving change in 2025. Our comprehensive report analyzes market dynamics and provides actionable insights for forward-thinking organizations." 
+            },
+            { 
+                id: 3, 
+                title: "Case Study: Digital Transformation", 
+                date: "2025-09-29", 
+                startDate: "2025-09-25",
+                endDate: "2025-11-10",
+                isActive: true,
+                impressions: 18000, 
+                completeViews: 4100, 
+                thumbnail: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=225&fit=crop", 
+                copy: "See how leading enterprises are leveraging digital transformation to drive growth, improve efficiency, and create competitive advantages in their markets." 
+            },
+            { 
+                id: 4, 
+                title: "Executive Roundtable Discussion", 
+                date: "2025-10-03", 
+                startDate: "2025-10-01",
+                endDate: "2025-10-20",
+                isActive: true,
+                impressions: 8500, 
+                completeViews: 1900, 
+                thumbnail: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=400&h=225&fit=crop", 
+                copy: "Industry leaders share their perspectives on navigating uncertainty and building resilient organizations in an era of rapid technological change." 
+            }
+        ];
+
+        let activityNotes = [
+            { id: 1, date: "2025-09-20", text: "Moved to Awareness stage - Views and Complete Views thresholds met.", type: "stage_promotion", fromStage: "Reach", toStage: "Awareness" },
+            { id: 2, date: "2025-09-25", text: "Moved to Credibility stage - Watch time threshold met.", type: "stage_promotion", fromStage: "Awareness", toStage: "Credibility" },
+            { id: 3, date: "2025-10-05", text: "Increased engagement noted after webinar series. Consider scheduling follow-up call.", type: "regular" },
+            { id: 4, date: "2025-10-01", text: "Initial outreach campaign launched. Strong impression growth across LinkedIn and programmatic channels.", type: "regular" },
+            { id: 5, date: "2025-09-18", text: "Added to Always On campaign. Setting baseline metrics and monitoring engagement patterns.", type: "regular" }
+        ];
+
+        const recommendations = {
+            Reach: [
+                "Increase ad frequency across LinkedIn and programmatic channels to boost impressions",
+                "Expand targeting parameters to reach additional decision-makers within the organization",
+                "Test different creative formats and messaging angles for better visibility",
+                "Consider retargeting website visitors to increase touchpoint frequency"
+            ],
+            Awareness: [
+                "Promote high-value video content to increase view rate and engagement depth",
+                "Create compelling CTAs in content to drive deeper interaction",
+                "A/B test landing page designs to improve conversion and time-on-site metrics",
+                "Deploy thought leadership content to build brand authority"
+            ],
+            Credibility: [
+                "Share customer success stories and case studies relevant to their industry",
+                "Engage target accounts through personalized, executive-level outreach",
+                "Invite key stakeholders to exclusive events or private briefings",
+                "Coordinate sales enablement to prepare for direct engagement opportunities"
+            ]
+        };
+
+        // State
+        let currentFilter = 'All';
+        let currentCompany = null;
+        let performanceChart = null;
+        let searchQuery = '';
+
+        // Utility functions
+        function getStageClass(stage) {
+            const classes = { 
+                Reach: 'stage-reach', 
+                Awareness: 'stage-awareness', 
+                Credibility: 'stage-credibility' 
+            };
+            return classes[stage] || 'stage-reach';
+        }
+
+        function checkThreshold(current, required) {
+            return current >= required;
+        }
+
+        function getProgressPercentage(current, required) {
+            return Math.min((current / required) * 100, 100);
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        function flipCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('flipped');
+            }
+        }
+
+        function isStageCompleted(company) {
+            switch (company.stage) {
+                case 'Reach':
+                    // Reach companies should advance automatically, so never "completed"
+                    return false;
+                case 'Awareness':
+                    return company.metrics.completeViews >= company.thresholds.credibility.completeViews;
+                case 'Credibility':
+                    return company.metrics.watchTime >= company.thresholds.credibility.watchTime;
+                default:
+                    return false;
+            }
+        }
+
+        function formatDateRange(startDate, endDate, isActive) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const today = new Date('2025-10-10'); // Current date from context
+            
+            const formatDate = (date) => {
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric'
+                });
+            };
+            
+            const startFormatted = formatDate(start);
+            const endFormatted = formatDate(end);
+            
+            if (isActive) {
+                return `${startFormatted} - now`;
+            } else {
+                return `${startFormatted} - ${endFormatted}`;
+            }
+        }
+
+        // Render functions
+        function renderCompanyCard(company) {
+            const cardId = `card-${company.id}`;
+            
+            // Get stage-specific icon
+            const stageIcons = {
+                'Reach': 'target',
+                'Awareness': 'eye',
+                'Credibility': 'award'
+            };
+            
+            const stageIcon = stageIcons[company.stage];
+            
+            // Calculate completion percentage for metrics
+            const completeViewsPercentage = company.metrics.views > 0 ? 
+                ((company.metrics.completeViews / company.metrics.views) * 100).toFixed(1) : 0;
+            
+            return `
+                <div class="relative h-96 flip-card" id="${cardId}" data-company-id="${company.id}" onclick="flipCard('${cardId}')">
+                    <div class="flip-card-inner">
+                        <!-- Front Face -->
+                        <div class="flip-card-front p-8 flex flex-col items-center justify-center hover:shadow-xl transition-shadow ${isStageCompleted(company) ? 'border-green-500 border-2' : ''}">
+                            <div class="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white mb-4 shadow-lg" style="background-color: #ff7c22;">${company.logo}</div>
+                            <h3 class="text-2xl font-bold text-gray-900 text-center mb-3">${company.name}</h3>
+                            
+                            <!-- Stage Progression Indicator -->
+                            ${renderStageProgression(company)}
+                            
+                            <div class="flex items-center gap-2 px-6 py-2 rounded-full ${isStageCompleted(company) ? 'bg-green-100' : getStageClass(company.stage)} mt-3" style="color: ${isStageCompleted(company) ? '#10b981' : '#ff7c22'};">
+                                <i data-lucide="${stageIcon}" class="w-4 h-4"></i>
+                                <span class="text-base font-semibold">${company.stage}</span>
+                                ${isStageCompleted(company) ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-500 ml-1"></i>' : ''}
+                            </div>
+                            
+                            <!-- Hero Metric Progress Bar -->
+                            ${renderHeroMetricProgress(company)}
+                            
+                            <!-- Click hint -->
+                            <div class="mt-4 text-xs text-gray-400 flex items-center gap-1">
+                                <i data-lucide="rotate-3d" class="w-3 h-3"></i>
+                                <span>Click to see metrics</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Back Face -->
+                        <div class="flip-card-back p-6 flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white mb-3 shadow-lg" style="background-color: #ff7c22;">${company.logo}</div>
+                            <h3 class="text-lg font-bold text-gray-900 text-center mb-4">${company.name}</h3>
+                            
+                            <!-- Key Metrics -->
+                            <div class="w-full space-y-3">
+                                <!-- Impressions -->
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-medium text-gray-600">Impressions</span>
+                                        <i data-lucide="eye" class="w-3 h-3 text-orange-500"></i>
+                                    </div>
+                                    <div class="text-xl font-bold text-gray-900">${formatNumber(company.metrics.impressions)}</div>
+                                </div>
+                                
+                                <!-- Complete Views -->
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-medium text-gray-600">Complete Views</span>
+                                        <i data-lucide="play-circle" class="w-3 h-3 text-orange-500"></i>
+                                    </div>
+                                    <div class="text-xl font-bold text-gray-900">${formatNumber(company.metrics.completeViews)}</div>
+                                </div>
+                                
+                                <!-- Complete Views Percentage -->
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-xs font-medium text-gray-600">Completion Rate</span>
+                                        <i data-lucide="percent" class="w-3 h-3 text-orange-500"></i>
+                                    </div>
+                                    <div class="text-xl font-bold text-gray-900">${completeViewsPercentage}%</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Click hint -->
+                            <div class="mt-3 text-xs text-gray-400 flex items-center gap-1">
+                                <i data-lucide="rotate-3d" class="w-3 h-3"></i>
+                                <span>Click to go back</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHeroMetricProgress(company) {
+            let current, target, label, unit = '';
+            
+            switch (company.stage) {
+                case 'Reach':
+                    current = company.metrics.impressions;
+                    target = company.thresholds.awareness.views; // Use next stage target for progression
+                    label = 'Impressions';
+                    break;
+                case 'Awareness':
+                    current = company.metrics.completeViews;
+                    target = company.thresholds.credibility.completeViews;
+                    label = 'Complete Views';
+                    break;
+                case 'Credibility':
+                    current = company.metrics.watchTime;
+                    target = company.thresholds.credibility.watchTime;
+                    label = 'Watch Time';
+                    unit = 'h';
+                    break;
+                default:
+                    return '';
+            }
+            
+            let percentage;
+            let isComplete = false;
+            
+            if (company.stage === 'Reach') {
+                // For Reach stage, cap at 99% since they should advance when hitting threshold
+                percentage = Math.min((current / target) * 100, 99);
+            } else if (company.stage === 'Awareness') {
+                percentage = Math.min((current / target) * 100, 100);
+                isComplete = current >= target;
+            } else if (company.stage === 'Credibility') {
+                // For Credibility stage, calculate actual percentage and check completion
+                percentage = Math.min((current / target) * 100, 100);
+                isComplete = current >= target;
+            }
+            
+            // Stage-specific colors
+            const stageColors = {
+                'Reach': '#f97316',
+                'Awareness': '#ea580c', 
+                'Credibility': '#dc2626'
+            };
+            
+            const color = stageColors[company.stage];
+            
+            return `
+                <div class="mt-4 w-full max-w-52">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium text-gray-700">${label}</span>
+                        <div class="text-right">
+                            <span class="text-sm font-semibold" style="color: ${color};">${formatNumber(current)}${unit}</span>
+                            <span class="text-xs text-gray-500 ml-1">60d avg</span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1.5">
+                        <div class="h-1.5 rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : ''}" 
+                             style="width: ${percentage}%; background-color: ${isComplete ? '#10b981' : color};"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStageProgression(company) {
+            const stages = ['Reach', 'Awareness', 'Credibility'];
+            const currentStageIndex = stages.indexOf(company.stage);
+            
+            // Calculate progress based on hero metric for current stage
+            let progressPercentage = 0;
+            if (company.stage === 'Reach') {
+                // For Reach stage, cap at 99% max since they should advance to Awareness if they hit the threshold
+                progressPercentage = Math.min((company.metrics.impressions / company.thresholds.awareness.views) * 100, 99);
+            } else if (company.stage === 'Awareness') {
+                progressPercentage = Math.min((company.metrics.completeViews / company.thresholds.credibility.completeViews) * 100, 100);
+            } else if (company.stage === 'Credibility') {
+                progressPercentage = 100; // Only Credibility stage is truly "complete"
+            }
+            
+            // Get stage movements from activity notes for this company
+            const stageMovements = activityNotes.filter(note => 
+                note.type === 'stage_promotion'
+            ).reverse(); // Show chronological order
+            
+            return `
+                <div class="flex items-center gap-2 mb-2">
+                    ${stages.map((stage, index) => {
+                        const isPastStage = index < currentStageIndex;
+                        const isCurrent = index === currentStageIndex;
+                        const isFutureStage = index > currentStageIndex;
+                        
+                        const stageConfig = {
+                            'Reach': { color: '#f97316', icon: 'target' },
+                            'Awareness': { color: '#ea580c', icon: 'eye' },
+                            'Credibility': { color: '#dc2626', icon: 'award' }
+                        };
+                        
+                        const config = stageConfig[stage];
+                        
+                        // Determine appearance based on stage position
+                        let backgroundColor, iconColor, ringStyle = '';
+                        
+                        if (isPastStage) {
+                            // Past stages - show they were achieved but not "completed"
+                            backgroundColor = config.color;
+                            iconColor = 'text-white';
+                        } else if (isCurrent) {
+                            // Current stage - show progress and check completion
+                            if (isStageCompleted(company)) {
+                                // Stage is completed - show green
+                                backgroundColor = '#10b981'; // Green for completion
+                                iconColor = 'text-white';
+                                ringStyle = 'ring-2 ring-green-400 ring-offset-1';
+                            } else {
+                                // In progress but not completed
+                                backgroundColor = config.color;
+                                iconColor = 'text-white';
+                                ringStyle = 'ring-2 ring-offset-1';
+                            }
+                        } else {
+                            // Future stages - gray
+                            backgroundColor = '#e5e7eb';
+                            iconColor = 'text-gray-400';
+                        }
+                        
+                        return `
+                            <div class="flex items-center ${index < stages.length - 1 ? 'gap-1' : ''}">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 ${ringStyle}" 
+                                     style="background-color: ${backgroundColor}; ring-color: ${isCurrent ? (isStageCompleted(company) ? '#10b981' : config.color) : 'transparent'};">
+                                    <i data-lucide="${config.icon}" class="w-3 h-3 ${iconColor}"></i>
+                                </div>
+                                ${index < stages.length - 1 ? `
+                                    <div class="relative w-3 h-0.5 bg-gray-200 rounded transition-all duration-300">
+                                        ${isPastStage ? `<div class="absolute inset-0 rounded" style="background-color: ${config.color};"></div>` : 
+                                        isCurrent && progressPercentage > 0 ? `<div class="absolute inset-0 rounded transition-all duration-500" style="width: ${Math.min(progressPercentage, 100)}%; background-color: ${isStageCompleted(company) ? '#10b981' : config.color};"></div>` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${stageMovements.length > 0 ? `
+                    <div class="text-xs text-gray-600 mb-1">
+                        <i data-lucide="calendar" class="w-3 h-3 inline mr-1"></i>
+                        Last promotion: ${stageMovements[stageMovements.length - 1].date}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderMetrics(company) {
+            if (company.stage === 'Reach') {
+                return `
+                    <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i data-lucide="trending-up" class="w-3.5 h-3.5" style="color: #ff7c22;"></i>
+                            <span class="text-xs font-semibold text-gray-700">Impressions</span>
+                        </div>
+                        <div class="text-lg font-bold text-gray-900">${formatNumber(company.metrics.impressions)}</div>
+                    </div>
+                    ${renderMetricBar('Views', company.metrics.views, company.thresholds.awareness.views, 'eye')}
+                    ${renderMetricBar('Complete Views', company.metrics.completeViews, company.thresholds.awareness.completeViews, 'play-circle')}
+                `;
+            } else if (company.stage === 'Awareness') {
+                return `
+                    <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i data-lucide="trending-up" class="w-3.5 h-3.5" style="color: #ff7c22;"></i>
+                            <span class="text-xs font-semibold text-gray-700">Impressions</span>
+                        </div>
+                        <div class="text-lg font-bold text-gray-900">${formatNumber(company.metrics.impressions)}</div>
+                    </div>
+                    ${renderMetricBar('Views', company.metrics.views, company.thresholds.credibility.views, 'eye')}
+                    ${renderMetricBar('Complete Views', company.metrics.completeViews, company.thresholds.credibility.completeViews, 'play-circle')}
+                    ${renderMetricBar('Watch Time (hrs)', company.metrics.watchTime, company.thresholds.credibility.watchTime, 'clock')}
+                `;
+            } else {
+                return `
+                    <div class="text-center py-8">
+                        <i data-lucide="check-circle" class="w-12 h-12 text-green-600 mx-auto mb-3"></i>
+                        <p class="text-sm font-semibold text-gray-700">All thresholds met!</p>
+                        <p class="text-xs text-gray-500 mt-2">This account is ready for<br/>direct sales engagement</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderMetricBar(label, current, required, iconName) {
+            const percentage = getProgressPercentage(current, required);
+            const isMet = checkThreshold(current, required);
+            const iconColor = isMet ? '#10b981' : '#6b7280';
+            const barColor = isMet ? '#10b981' : '#ff7c22';
+            
+            return `
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${iconName}" class="w-3.5 h-3.5" style="color: #ff7c22;"></i>
+                            <span class="text-xs font-semibold text-gray-700">${label}</span>
+                            <i data-lucide="${isMet ? 'check-circle' : 'x-circle'}" class="w-3.5 h-3.5" style="color: ${iconColor};"></i>
+                        </div>
+                        <span class="text-xs text-gray-600">${formatNumber(current)} / ${formatNumber(required)}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%; background-color: ${barColor};"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCompanies() {
+            // Get all stage containers
+            const reachContainer = document.getElementById('reach-companies');
+            const awarenessContainer = document.getElementById('awareness-companies');
+            const credibilityContainer = document.getElementById('credibility-companies');
+            
+            // Get count elements
+            const reachCount = document.getElementById('reach-count');
+            const awarenessCount = document.getElementById('awareness-count');
+            const credibilityCount = document.getElementById('credibility-count');
+            
+            // Filter companies by search query
+            let filteredCompanies = companies;
+            if (searchQuery.trim()) {
+                filteredCompanies = filteredCompanies.filter(c => 
+                    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+            
+            // Separate companies by stage
+            const reachCompanies = filteredCompanies.filter(c => c.stage === 'Reach');
+            const awarenessCompanies = filteredCompanies.filter(c => c.stage === 'Awareness');
+            const credibilityCompanies = filteredCompanies.filter(c => c.stage === 'Credibility');
+            
+            // Update counts
+            reachCount.textContent = `${reachCompanies.length} ${reachCompanies.length === 1 ? 'company' : 'companies'}`;
+            awarenessCount.textContent = `${awarenessCompanies.length} ${awarenessCompanies.length === 1 ? 'company' : 'companies'}`;
+            credibilityCount.textContent = `${credibilityCompanies.length} ${credibilityCompanies.length === 1 ? 'company' : 'companies'}`;
+            
+            // Apply stage filter visibility
+            const reachSection = reachContainer.closest('.stage-section');
+            const awarenessSection = awarenessContainer.closest('.stage-section');
+            const credibilitySection = credibilityContainer.closest('.stage-section');
+            
+            if (currentFilter === 'All') {
+                // Show all sections
+                reachSection.style.display = 'block';
+                awarenessSection.style.display = 'block';
+                credibilitySection.style.display = 'block';
+            } else {
+                // Hide sections based on filter
+                reachSection.style.display = currentFilter === 'Reach' ? 'block' : 'none';
+                awarenessSection.style.display = currentFilter === 'Awareness' ? 'block' : 'none';
+                credibilitySection.style.display = currentFilter === 'Credibility' ? 'block' : 'none';
+            }
+            
+            // Render companies in each stage
+            reachContainer.innerHTML = reachCompanies.length > 0 ? 
+                reachCompanies.map(company => renderCompanyCard(company)).join('') :
+                '<div class="col-span-4 text-center py-8 text-gray-500">No companies in Reach stage</div>';
+                
+            awarenessContainer.innerHTML = awarenessCompanies.length > 0 ? 
+                awarenessCompanies.map(company => renderCompanyCard(company)).join('') :
+                '<div class="col-span-4 text-center py-8 text-gray-500">No companies in Awareness stage</div>';
+                
+            credibilityContainer.innerHTML = credibilityCompanies.length > 0 ? 
+                credibilityCompanies.map(company => renderCompanyCard(company)).join('') :
+                '<div class="col-span-4 text-center py-8 text-gray-500">No companies in Credibility stage</div>';
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function showCompanyDetail(companyId) {
+            currentCompany = companies.find(c => c.id === companyId);
+            if (!currentCompany) return;
+            
+            // Update company header
+            document.getElementById('company-logo').textContent = currentCompany.logo;
+            document.getElementById('company-name').textContent = currentCompany.name;
+            document.getElementById('company-stage').textContent = `${currentCompany.stage} Stage`;
+            document.getElementById('company-stage').className = `inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStageClass(currentCompany.stage)}`;
+            
+            // Render content history
+            renderContentHistory();
+            
+            // Render activity notes
+            renderActivityNotes();
+            
+            // Render recommendations
+            renderRecommendations();
+            
+            // Show company view
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('company-view').classList.remove('hidden');
+            
+            // Create performance chart
+            createPerformanceChart();
+        }
+
+        function createPerformanceChart() {
+            const ctx = document.getElementById('performance-chart').getContext('2d');
+            
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
+            // Update hero metrics summary
+            updateHeroMetricsSummary();
+            
+            // Create datasets based on company stage
+            const datasets = [];
+
+            // For all stages: Show Impressions
+            datasets.push({
+                label: 'Impressions',
+                data: performanceData.map(d => d.impressions),
+                borderColor: '#ff7c22',
+                backgroundColor: 'rgba(255, 124, 34, 0.05)',
+                borderWidth: 4,
+                pointBackgroundColor: '#ff7c22',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: '#ff7c22',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                yAxisID: 'y'
+            });
+
+            // For Awareness and Credibility stages: Add Views, Complete Views, and Complete View %
+            if (currentCompany.stage === 'Awareness' || currentCompany.stage === 'Credibility') {
+                // Views
+                datasets.push({
+                    label: 'Views',
+                    data: performanceData.map(d => Math.round(d.impressions * 0.15)), // Simulate views from impressions
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#10b981',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y'
+                });
+
+                // Complete Views
+                datasets.push({
+                    label: 'Complete Views',
+                    data: performanceData.map(d => d.completeViews),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#8b5cf6',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y'
+                });
+
+                // Complete View Rate %
+                datasets.push({
+                    label: 'Complete View Rate (%)',
+                    data: performanceData.map(d => d.completeViewRate),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#f59e0b',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                });
+            }
+
+            // Determine Y-axis configuration based on stage
+            let leftAxisTitle = '';
+            let rightAxisTitle = '';
+            let rightAxisVisible = false;
+
+            if (currentCompany.stage === 'Reach') {
+                leftAxisTitle = 'Impressions';
+                rightAxisVisible = false;
+            } else if (currentCompany.stage === 'Awareness' || currentCompany.stage === 'Credibility') {
+                leftAxisTitle = 'Impressions, Views & Complete Views';
+                rightAxisTitle = 'Complete View Rate (%)';
+                rightAxisVisible = true;
+            }
+            
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: performanceData.map(d => d.date),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${currentCompany.name} - ${currentCompany.stage} Stage Performance`,
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            color: '#374151',
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'center',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: {
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                color: '#374151'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#374151',
+                            bodyColor: '#6b7280',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 12,
+                            displayColors: true,
+                            usePointStyle: true,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label === 'Complete View Rate (%)') {
+                                        label += context.parsed.y.toFixed(1) + '%';
+                                    } else {
+                                        label += context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Campaign Timeline',
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(209, 213, 219, 0.3)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: leftAxisTitle,
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(209, 213, 219, 0.3)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: rightAxisVisible,
+                            position: 'right',
+                            title: {
+                                display: rightAxisVisible,
+                                text: rightAxisTitle,
+                                color: '#6b7280',
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                                color: 'rgba(245, 158, 11, 0.2)'
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            borderJoinStyle: 'round'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update hero metrics summary with progress bars
+        function updateHeroMetricsSummary() {
+            const container = document.getElementById('hero-metrics-summary');
+            const stageBadge = document.getElementById('stage-badge');
+            const metrics = currentCompany.metrics;
+            
+            // Update stage badge
+            if (currentCompany.stage === 'Credibility') {
+                stageBadge.innerHTML = `
+                    <div class="flex items-center gap-2 px-4 py-2 bg-green-100 border-2 border-green-300 rounded-full">
+                        <i data-lucide="trophy" class="w-5 h-5 text-green-600"></i>
+                        <span class="text-green-800 font-bold">🎉 Credibility Achieved!</span>
+                        <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                    </div>
+                `;
+            } else {
+                const nextStage = currentCompany.stage === 'Reach' ? 'Awareness' : 'Credibility';
+                stageBadge.innerHTML = `
+                    <div class="flex items-center gap-2 px-4 py-2 bg-orange-100 border-2 border-orange-300 rounded-full">
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-orange-600"></i>
+                        <span class="text-orange-800 font-semibold">Next: ${nextStage} Stage</span>
+                        <i data-lucide="target" class="w-4 h-4 text-orange-600"></i>
+                    </div>
+                `;
+            }
+            
+            let metricsHtml = '';
+            
+            // Impressions (always shown)
+            metricsHtml += `
+                <div class="bg-white p-4 rounded-lg border-2 border-orange-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="trending-up" class="w-5 h-5" style="color: #ff7c22;"></i>
+                        <span class="text-sm font-semibold text-gray-700">Impressions</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 mb-2">${formatNumber(metrics.impressions)}</div>
+                    <div class="text-xs text-gray-500">No threshold - baseline metric</div>
+                </div>
+            `;
+            
+            if (currentCompany.stage === 'Awareness' || currentCompany.stage === 'Credibility') {
+                // Views with progress bar
+                const viewsTarget = currentCompany.stage === 'Awareness' ? 
+                    currentCompany.thresholds.credibility.views : 
+                    currentCompany.thresholds.credibility.views;
+                const viewsProgress = Math.min((metrics.views / viewsTarget) * 100, 100);
+                const viewsMet = metrics.views >= viewsTarget;
+                
+                metricsHtml += `
+                    <div class="bg-white p-4 rounded-lg border-2 ${viewsMet ? 'border-green-200' : 'border-green-200'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="eye" class="w-5 h-5" style="color: #10b981;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Views</span>
+                            ${viewsMet ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>' : ''}
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mb-2">${formatNumber(metrics.views)}</div>
+                        <div class="mb-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-gray-600">Target: ${formatNumber(viewsTarget)}</span>
+                                <span class="text-xs font-semibold ${viewsMet ? 'text-green-600' : 'text-orange-600'}">${viewsProgress.toFixed(0)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full transition-all duration-500 ${viewsMet ? 'bg-green-500' : 'bg-orange-400'}" style="width: ${Math.min(viewsProgress, 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Complete Views with progress bar
+                const completeViewsTarget = currentCompany.stage === 'Awareness' ? 
+                    currentCompany.thresholds.credibility.completeViews : 
+                    currentCompany.thresholds.credibility.completeViews;
+                const completeViewsProgress = Math.min((metrics.completeViews / completeViewsTarget) * 100, 100);
+                const completeViewsMet = metrics.completeViews >= completeViewsTarget;
+                
+                metricsHtml += `
+                    <div class="bg-white p-4 rounded-lg border-2 ${completeViewsMet ? 'border-green-200' : 'border-purple-200'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="play-circle" class="w-5 h-5" style="color: #8b5cf6;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Complete Views</span>
+                            ${completeViewsMet ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>' : ''}
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mb-2">${formatNumber(metrics.completeViews)}</div>
+                        <div class="mb-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs text-gray-600">Target: ${formatNumber(completeViewsTarget)}</span>
+                                <span class="text-xs font-semibold ${completeViewsMet ? 'text-green-600' : 'text-purple-600'}">${completeViewsProgress.toFixed(0)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full transition-all duration-500 ${completeViewsMet ? 'bg-green-500' : 'bg-purple-400'}" style="width: ${Math.min(completeViewsProgress, 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Complete View Rate (no progress bar needed)
+                metricsHtml += `
+                    <div class="bg-white p-4 rounded-lg border-2 border-amber-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="percent" class="w-5 h-5" style="color: #f59e0b;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Complete View Rate</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 mb-2">${metrics.views > 0 ? ((metrics.completeViews / metrics.views) * 100).toFixed(1) : 0}%</div>
+                        <div class="text-xs text-gray-500">Quality metric - no threshold</div>
+                    </div>
+                `;
+                
+                // Watch Time for Awareness stage companies
+                if (currentCompany.stage === 'Awareness') {
+                    container.className = 'grid grid-cols-5 gap-4 p-6 bg-gray-50 rounded-lg'; // Change to 5 columns
+                    
+                    const watchTimeTarget = currentCompany.thresholds.credibility.watchTime;
+                    const watchTimeProgress = Math.min((metrics.watchTime / watchTimeTarget) * 100, 100);
+                    const watchTimeMet = metrics.watchTime >= watchTimeTarget;
+                    
+                    metricsHtml += `
+                        <div class="bg-white p-4 rounded-lg border-2 ${watchTimeMet ? 'border-green-200' : 'border-blue-200'}">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="clock" class="w-5 h-5" style="color: #3b82f6;"></i>
+                                <span class="text-sm font-semibold text-gray-700">Watch Time</span>
+                                ${watchTimeMet ? '<i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>' : ''}
+                            </div>
+                            <div class="text-2xl font-bold text-gray-900 mb-2">${formatNumber(metrics.watchTime)}h</div>
+                            <div class="mb-2">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs text-gray-600">Target: ${formatNumber(watchTimeTarget)}h</span>
+                                    <span class="text-xs font-semibold ${watchTimeMet ? 'text-green-600' : 'text-blue-600'}">${watchTimeProgress.toFixed(0)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="h-2 rounded-full transition-all duration-500 ${watchTimeMet ? 'bg-green-500' : 'bg-blue-400'}" style="width: ${Math.min(watchTimeProgress, 100)}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.className = 'grid grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg'; // Keep 4 columns
+                }
+                
+            } else {
+                // For Reach stage, show next stage requirements
+                container.className = 'grid grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg';
+                
+                metricsHtml += `
+                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="target" class="w-5 h-5" style="color: #6b7280;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Views Needed</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-600 mb-2">${formatNumber(currentCompany.thresholds.awareness.views)}</div>
+                        <div class="text-xs text-gray-500">for Awareness stage</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="target" class="w-5 h-5" style="color: #6b7280;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Complete Views Needed</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-600 mb-2">${formatNumber(currentCompany.thresholds.awareness.completeViews)}</div>
+                        <div class="text-xs text-gray-500">for Awareness stage</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="arrow-up" class="w-5 h-5" style="color: #6b7280;"></i>
+                            <span class="text-sm font-semibold text-gray-700">Next Stage</span>
+                        </div>
+                        <div class="text-lg font-bold text-gray-600 mb-2">Awareness</div>
+                        <div class="text-xs text-gray-500">target stage</div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = metricsHtml;
+            lucide.createIcons();
+        }
+
+        function renderContentHistory() {
+            const container = document.getElementById('content-history');
+            container.innerHTML = contentHistory.map(content => {
+                const completeViewRate = content.impressions > 0 ? ((content.completeViews / content.impressions) * 100).toFixed(1) : 0;
+                const dateRange = formatDateRange(content.startDate, content.endDate, content.isActive);
+                const statusClass = content.isActive ? 'text-green-600' : 'text-gray-500';
+                const statusIcon = content.isActive ? 'play-circle' : 'calendar';
+                const borderColor = content.isActive ? '#10b981' : '#6b7280';
+                
+                return `
+                    <div class="border-l-4 pl-5 py-3 hover:bg-gray-50 transition-colors rounded-r cursor-pointer content-item" style="border-color: ${borderColor};" data-content-id="${content.id}">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="font-semibold text-gray-900 text-lg">${content.title}</div>
+                            ${content.isActive ? `
+                                <div class="flex items-center gap-1 ${statusClass}">
+                                    <i data-lucide="play-circle" class="w-4 h-4"></i>
+                                    <span class="text-sm font-medium">Active</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="text-sm text-gray-500 mt-1">Published: ${content.date}</div>
+                        <div class="text-sm ${statusClass} mt-1 font-medium">
+                            <i data-lucide="${statusIcon}" class="w-4 h-4 inline mr-1"></i>
+                            ${dateRange}
+                        </div>
+                        <div class="text-sm text-gray-600 mt-2 flex gap-4">
+                            <span>${formatNumber(content.impressions)} impressions</span>
+                            <span>•</span>
+                            <span>${formatNumber(content.completeViews)} complete views</span>
+                            <span>•</span>
+                            <span>${completeViewRate}% complete view rate</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers
+            document.querySelectorAll('.content-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const contentId = parseInt(item.dataset.contentId);
+                    showContentModal(contentId);
+                });
+            });
+            
+            // Refresh Lucide icons
+            lucide.createIcons();
+        }
+
+        function renderActivityNotes() {
+            const container = document.getElementById('activity-notes');
+            container.innerHTML = activityNotes.map(note => {
+                if (note.type === 'stage_promotion') {
+                    // Get stage-specific colors and icons
+                    const stageConfig = {
+                        'Reach': { color: '#f97316', bgColor: '#fff7ed', icon: 'target' },
+                        'Awareness': { color: '#ea580c', bgColor: '#ffedd5', icon: 'eye' },
+                        'Credibility': { color: '#dc2626', bgColor: '#fee2e2', icon: 'award' }
+                    };
+                    
+                    const fromConfig = stageConfig[note.fromStage];
+                    const toConfig = stageConfig[note.toStage];
+                    
+                    return `
+                        <div class="border-l-4 pl-5 py-4 hover:bg-gray-50 transition-colors rounded-r relative" style="border-color: ${toConfig.color}; background-color: ${toConfig.bgColor};">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: ${fromConfig.color};">
+                                        <i data-lucide="${fromConfig.icon}" class="w-3 h-3 text-white"></i>
+                                    </div>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-600"></i>
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center" style="background-color: ${toConfig.color};">
+                                        <i data-lucide="${toConfig.icon}" class="w-3 h-3 text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style="background-color: ${toConfig.color}; color: white;">
+                                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                                    <span>Stage Promotion</span>
+                                </div>
+                            </div>
+                            <div class="text-sm font-bold mb-1" style="color: ${toConfig.color};">${note.date}</div>
+                            <div class="text-sm font-medium" style="color: ${toConfig.color};">${note.text}</div>
+                            <div class="absolute top-4 right-4">
+                                <i data-lucide="star" class="w-5 h-5" style="color: ${toConfig.color};"></i>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Regular activity note styling
+                    return `
+                        <div class="border-l-4 border-gray-300 pl-5 py-3 hover:bg-gray-50 transition-colors rounded-r">
+                            <div class="text-sm font-bold mb-1" style="color: #ff7c22;">${note.date}</div>
+                            <div class="text-sm text-gray-700 leading-relaxed">${note.text}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function renderRecommendations() {
+            const container = document.getElementById('recommendations-grid');
+            const title = document.getElementById('recommendations-title');
+            const recs = recommendations[currentCompany.stage] || [];
+            
+            title.textContent = `Recommended Actions for ${currentCompany.stage}`;
+            
+            container.innerHTML = recs.map((rec, index) => {
+                const icons = ['target', 'trending-up', 'users', 'zap'];
+                const icon = icons[index % icons.length];
+                
+                return `
+                    <div class="bg-white p-6 rounded-xl border-2 border-white hover:border-orange-300 hover:shadow-lg transition-all duration-200 group">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-200" style="background-color: #ff7c22;">
+                                <i data-lucide="${icon}" class="w-5 h-5 text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-gray-800 leading-relaxed font-medium">${rec}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+
+        function showContentModal(contentId) {
+            const content = contentHistory.find(c => c.id === contentId);
+            if (!content) return;
+            
+            document.getElementById('modal-title').textContent = content.title;
+            document.getElementById('modal-date').textContent = content.date;
+            document.getElementById('modal-thumbnail').src = content.thumbnail;
+            document.getElementById('modal-impressions').textContent = formatNumber(content.impressions);
+            document.getElementById('modal-views').textContent = formatNumber(content.completeViews);
+            document.getElementById('modal-rate').textContent = `${((content.completeViews / content.impressions) * 100).toFixed(1)}%`;
+            document.getElementById('modal-copy').textContent = content.copy;
+            
+            document.getElementById('content-modal').classList.add('active');
+        }
+
+        function hideContentModal() {
+            document.getElementById('content-modal').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('company-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            currentCompany = null;
+            
+            if (performanceChart) {
+                performanceChart.destroy();
+                performanceChart = null;
+            }
+        }
+
+        function updateProgrammeSummary() {
+            // Calculate totals from all companies
+            let totalImpressions = 0;
+            let totalCompleteViews = 0;
+            let totalWatchTime = 0;
+            
+            companies.forEach(company => {
+                totalImpressions += company.metrics.impressions;
+                totalCompleteViews += company.metrics.completeViews;
+                totalWatchTime += company.metrics.watchTime;
+            });
+            
+            // Update the UI
+            document.getElementById('targets-count').textContent = companies.length;
+            document.getElementById('total-impressions').textContent = formatNumber(totalImpressions);
+            document.getElementById('total-complete-views').textContent = formatNumber(totalCompleteViews);
+            document.getElementById('total-watch-time').textContent = formatNumber(totalWatchTime);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Search functionality
+            document.getElementById('company-search').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderCompanies();
+            });
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderCompanies();
+                });
+            });
+            
+            // Modal close
+            document.getElementById('close-modal').addEventListener('click', hideContentModal);
+            document.getElementById('content-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'content-modal') {
+                    hideContentModal();
+                }
+            });
+            
+            // Initial render
+            updateProgrammeSummary();
+            renderCompanies();
+        });
+    </script>
+</body>
+</html>
